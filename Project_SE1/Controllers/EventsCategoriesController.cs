@@ -21,7 +21,12 @@ namespace project_dnc_se1.Controllers
         // GET: EventsCategories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.EventsCategories.ToListAsync());
+
+            var events = await _context.EventsCategories
+                .Where(e => e.IsDeleted == false)
+                .ToListAsync();
+
+            return View(events);
         }
 
         // GET: EventsCategories/Details/5
@@ -145,12 +150,56 @@ namespace project_dnc_se1.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Trash));
         }
 
         private bool EventsCategoryExists(int id)
         {
             return _context.EventsCategories.Any(e => e.Id == id);
+        }
+
+        // POST: EventsCategories/SoftDelete/5
+        [HttpPost]
+        public async Task<IActionResult> SoftDelete(int id)
+        {
+            var ev = await _context.EventsCategories.FindAsync(id);
+            if (ev == null)
+            {
+                return NotFound();
+            }
+
+            ev.IsDeleted = true;
+            _context.Update(ev);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        // POST: EventsCategories/Restore/5
+        [HttpPost, ActionName("Restore")]
+        [HttpPost]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var ev = await _context.EventsCategories.FindAsync(id);
+            if (ev == null)
+            {
+                return NotFound();
+            }
+
+            ev.IsDeleted = false;
+            _context.Update(ev);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Trash));
+        }
+        public async Task<IActionResult> Trash()
+        {
+            var deletedEvents = await _context.EventsCategories
+                .Where(e => e.IsDeleted == true)
+                .ToListAsync();
+
+            return View(deletedEvents);
         }
     }
 }

@@ -28,7 +28,6 @@
             Ảnh bìa
         </dt>
         <dd class="col-sm-10">
-            @* @Html.DisplayFor(model => model.Banners) *@
             <img src="@Model.Banners" alt="Ảnh bìa" width="100" />
         </dd>
         <dt class="col-sm-2">
@@ -36,12 +35,6 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            IsDeleted
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IsDeleted)
         </dd>
         <dt class="col-sm-2">
             Danh mục

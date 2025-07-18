@@ -8,6 +8,6 @@ public partial class EventsCategory
     public int Id { get; set; }
 
     public string? Title { get; set; }
-
-    public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+    public bool? IsDeleted { get; set; } = false;
+    public virtual ICollection<Event> Events { get; set; } = [];
 }

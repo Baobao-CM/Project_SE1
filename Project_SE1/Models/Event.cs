@@ -23,9 +23,9 @@ public partial class Event
 
     public virtual EventsCategory? Category { get; set; }
 
-    public virtual ICollection<ContactInfo> ContactInfos { get; set; } = new List<ContactInfo>();
+    public virtual ICollection<ContactInfo> ContactInfos { get; set; } = [];
 
-    public virtual ICollection<EventsProduct> EventsProducts { get; set; } = new List<EventsProduct>();
+    public virtual ICollection<EventsProduct> EventsProducts { get; set; } = [];
 
     public virtual User? User { get; set; }
 }

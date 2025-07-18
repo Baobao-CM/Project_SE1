@@ -8,9 +8,12 @@
 
 <h1>Danh mục sự kiện</h1>
 
-<p>
+<div class="d-flex">
     <a asp-action="Create" class="btn btn-primary">Tạo danh mục</a>
-</p>
+    <a asp-action="Trash" class="text-decoration-none">
+        Danh sách đã xoá
+    </a>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -31,9 +34,9 @@
                     <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
                         <i class="bi bi-pencil-square"></i>
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <form asp-action="SoftDelete" asp-route-id="@item.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</button>
+                    </form>
                 </td>
             </tr>
         }

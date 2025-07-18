@@ -44,11 +44,12 @@
                     @Html.DisplayFor(modelItem => item.Message)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Events.Title)
+                    @Html.Raw(item?.Events?.Title ?? "--")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Product.Title)
+                    @Html.Raw(item?.Product?.Title ?? "--")
                 </td>
+
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
                         <i class="bi bi-pencil-square"></i>

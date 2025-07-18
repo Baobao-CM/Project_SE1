@@ -22,7 +22,7 @@
             @foreach (var category in ViewBag.Categories as List<project_dnc_se1.Models.EventsCategory>)
             {
                 var selected = category.Id.ToString() == (ViewBag.SelectedCategoryId?.ToString() ?? "") ? "selected" : "";
-                                                                                                    <option value="@category.Id" selected="@selected">@category.Title</option>
+                <option value="@category.Id" selected="@selected">@category.Title</option>
             }
         </select>
 
@@ -43,12 +43,6 @@
                 Ảnh bìa
             </th>
             <th>
-                @* @Html.DisplayNameFor(model => model.UpdatedAt) *@
-            </th>
-            <th>
-                @*  @Html.DisplayNameFor(model => model.IsDeleted) *@
-            </th>
-            <th>
 
                 Danh mục
             </th>
@@ -61,40 +55,34 @@
     <tbody>
         @foreach (var item in Model)
         {
-                                                                                                <tr>
-                                                                                                    <td>
+            <tr>
+                <td>
                     @Html.DisplayFor(modelItem => item.Title)
-                                                                                                    </td>
-                                                                                                    <td>
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Value)
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <img src="@item.Banners" alt="Ảnh bìa" width="100" />
-                                                                                                    </td>
-                                                                                                    <td>
-                    @* @Html.DisplayFor(modelItem => item.UpdatedAt) *@
-                                                                                                    </td>
-                                                                                                    <td>
-                    @* @Html.DisplayFor(modelItem => item.IsDeleted) *@
-                                                                                                    </td>
-                                                                                                    <td>
+                </td>
+                <td>
+                    <img src="@item.Banners" alt="Ảnh bìa" width="100" />
+                </td>
+                <td>
                     @item.Category?.Title
-                                                                                                    </td>
-                                                                                                    <td>
+                </td>
+                <td>
                     @item.User.FullName
 
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
-                                                                                                            <i class="bi bi-pencil-square"></i>
-                                                                                                        </a>
-                                                                                                        <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
-                                                                                                            <i class="bi bi-journal-richtext"></i>
-                                                                                                        </a>
-                                                                                                        <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
-                                                                                                            <i class="bi bi-trash"></i>
-                                                                                                        </a>
-                                                                                                </tr>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-journal-richtext"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-trash"></i>
+                    </a>
+            </tr>
         }
     </tbody>
 </table>
