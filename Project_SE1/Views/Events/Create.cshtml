@@ -1,0 +1,71 @@
+﻿@model project_dnc_se1.Models.Event
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Tạo Sự kiện";
+
+}
+
+<h4>Tạo sự kiện</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Tên sự kiện</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="Value" class="control-label">Mô tả</label>
+                <input asp-for="Value" class="form-control" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+
+            @* Create category *@
+            <div class="form-group mt-3">
+                <label asp-for="CategoryId" class="control-label">Danh mục</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"><option value=""></option></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            @* end *@
+
+            <div class="form-group mt-3">
+                <label for="upload" class="control-label">Chọn ảnh bìa </label>
+                <input type="file" name="upload" id="upload" class="form-control" />
+            </div>
+
+            <div class="form-group mt-3 d-flex gap-2">
+                <input type="submit" value="Tạo" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="https://cdn.ckeditor.com/ckeditor5/41.2.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#Value'), {
+            ckfinder: {
+                uploadUrl: '/Events/UploadBanners'
+            },
+            toolbar: [
+                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+                'imageUpload', 'undo', 'redo'
+            ],
+            image: {
+                toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+

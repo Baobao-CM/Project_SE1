@@ -1,0 +1,28 @@
+﻿@model project_dnc_se1.Models.NewsCategory
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Xoá danh mục tin tức";
+
+}
+
+<h1>Xoá danh mục tin tức</h1>
+
+<h3>Bạn có chắc muốn xoá danh mục này chứ?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Tiêu đề
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xoá" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </form>
+</div>

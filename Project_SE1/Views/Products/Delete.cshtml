@@ -1,0 +1,41 @@
+﻿@model project_dnc_se1.Models.Product
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Xoá sản phẩm";
+
+}
+
+<h1>Xoá sản phẩm</h1>
+
+<h3>Bạn có chắc muốn xoá sản phẩm này chứ?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Tên sản phẩm
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            Ảnh đại diện
+        </dt>
+        <dd class="col-sm-10">
+            <img src="@Model.ThumbNail" alt="Ảnh bìa" width="100" />
+        </dd>
+
+        <dt class="col-sm-2">
+            Danh mục
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Category.Title)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xoá" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </form>
+</div>

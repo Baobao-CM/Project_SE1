@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewData["Title"] = "Đăng nhập";
+}
+
+
+<div class="limiter loginF">
+    <div class="container-login100">
+        <div class="wrap-login100 p-t-30 p-b-50">
+            <div class="login100-form-title p-b-41">
+                Đăng nhập
+            </div>
+            <form class="login100-form validate-form p-b-33 p-t-5" asp-action="Login" method="post" autocomplete="on">
+
+                <div class="wrap-input100 validate-input" data-validate="Enter username">
+                    <input name="username" class="input100" required placeholder="Tên đăng nhập" />
+                    <span class="focus-input100" data-placeholder="&#xF4E1;"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input" data-validate="Enter password">
+                    <input name="password" type="password" class="input100" required placeholder="Mật khẩu" />
+                    <span class="focus-input100" data-placeholder="&#xF47B;"></span>
+                </div>
+
+                <div class="container-login100-form-btn m-t-32">
+                    <button class="login100-form-btn" type="submit">
+                        Đăng nhập
+                    </button>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="text-danger">@ViewBag.Error</div>
+                }
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@{
+}

@@ -1,0 +1,117 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<project_dnc_se1.Models.News>
+
+
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Quản lí tin tức";
+
+}
+<h1>Quản lí tin tức</h1>
+@* Tìm kiếm *@
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <a asp-action="Create" class="btn btn-primary">Tạo tin tức</a>
+    <form method="get" asp-controller="News" asp-action="Index" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm theo tiêu đề..." class="form-control" />
+
+        <select name="categoryId" class="form-select">
+            <option value="">Tất cả danh mục</option>
+            @foreach (var category in ViewBag.Categories as List<project_dnc_se1.Models.NewsCategory>)
+            {
+                var selected = category.Id.ToString() == (ViewBag.SelectedCategoryId?.ToString() ?? "") ? "selected" : "";
+                <option value="@category.Id" selected="@selected">@category.Title</option>
+            }
+        </select>
+
+        <button type="submit" class="btn btn-outline-info"><i class="bi bi-search"></i></button>
+    </form>
+</div>
+@* emd tim kiếm *@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Tiêu đề
+            </th>
+            <th>
+                Mô tả
+            </th>
+            <th>
+                Ảnh bìa
+            </th>
+            @* <th>
+            @Html.DisplayNameFor(model => model.IsDeleted)
+            </th> *@
+            <th>
+                Danh mục
+            </th>
+            <th>
+                Người tạo
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+                <td>
+                    <img src="@item.Banners" alt="Ảnh bìa" width="100" />
+                </td>
+                @*             <td>
+            @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td> *@
+                @*             <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+            </td> *@
+                <td>
+
+                    @item.Category?.Title
+                </td>
+                <td>
+                    @item.User.FullName
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-journal-richtext"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Thanh phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            keyword = Context.Request.Query["keyword"],
+            categoryId = Context.Request.Query["categoryId"]
+        }), new PagedListRenderOptions
+{
+    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+    MaximumPageNumbersToDisplay = 5,
+    UlElementClasses = new[] { "pagination" },
+    LiElementClasses = new[] { "page-item" },
+    PageClasses = new[] { "page-link" }
+})
+
+</div>

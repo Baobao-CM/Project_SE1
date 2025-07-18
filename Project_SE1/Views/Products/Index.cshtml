@@ -1,0 +1,134 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+
+
+@model IPagedList<project_dnc_se1.Models.Product>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // admin layout
+    ViewData["Title"] = "Quản lý sản phẩm";
+
+}
+
+<h1 class="mt-4">Danh sách sản phẩm</h1>
+
+@* Tìm kiếm *@
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <a class=" btn btn-primary " asp-action="Create" asp-controller="Products">Tạo mới</a>
+    <form method="get" asp-controller="Products" asp-action="Index" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm theo tiêu đề..." class="form-control" />
+
+        <select name="categoryId" class="form-select">
+
+            <option value="">Tất cả danh mục</option>
+            @foreach (var category in ViewBag.Categories as List<project_dnc_se1.Models.ProductCategory>)
+            {
+                var selected = category.Id.ToString() == (ViewBag.SelectedCategoryId?.ToString() ?? "") ? "selected" : "";
+                <option value="@category.Id" selected="@selected">@category.Title</option>
+            }
+        </select>
+
+        <button type="submit" class="btn btn-outline-info"><i class="bi bi-search"></i></button>
+    </form>
+
+    @* emd tim kiếm *@
+
+</div>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>
+
+            </th>
+            <th>
+                Tên sản phẩm
+
+            </th>
+            <th>
+                Mô tả sản phẩm
+            </th>
+            <th>
+                Nổi bật
+            </th>
+            <th>
+                Danh mục
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+
+                    @if (!string.IsNullOrEmpty(item.ThumbNail))
+                    {
+                        <img src="@Url.Content(item.ThumbNail)" height="100" width="100" class="object-fit-cover" alt="@item.Title" />
+                    }
+                    else
+                    {
+                        <img src="https://placehold.co/600x400?text=Error" height="100" width="100" class="object-fit-cover" alt="Không có ảnh" />
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="text-ellipsis">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+
+                <td>
+                    @if (item.IsFeatured == true)
+                    {
+                        <i class="bi bi-star-fill text-warning"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-star text-warning"></i>
+                    }
+                </td>
+                <td>
+                    @item.Category?.Title
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-journal-richtext"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Thanh phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            keyword = Context.Request.Query["keyword"],
+            categoryId = Context.Request.Query["categoryId"]
+        }), new PagedListRenderOptions
+{
+    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+    MaximumPageNumbersToDisplay = 5,
+    UlElementClasses = new[] { "pagination" },
+    LiElementClasses = new[] { "page-item" },
+    PageClasses = new[] { "page-link" }
+})
+</div>
+@section Scripts {
+
+
+}
+
+

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<project_dnc_se1.Models.User>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Tài khoản";
+
+}
+
+
+<h1>Tài khoản</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo tài khoản</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Tên đăng nhập
+            </th>
+            <th>
+                Mật khẩu
+            </th>
+            <th>
+                Họ và tên
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                Vai trò
+            </th>
+            <th>
+                Ngày tạo
+            </th>
+            @*             <th>
+            @Html.DisplayNameFor(model => model.UpdatedAt)
+            </th> *@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Password)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                @*             <td>
+            @Html.DisplayFor(modelItem => item.Role)
+            </td> *@
+                <td>
+                    @(item.Role == 0 ? "Supper Admin" : "Admin")
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedAt)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-journal-richtext"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

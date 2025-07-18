@@ -1,0 +1,16 @@
+﻿
+@model project_dnc_se1.Models.ProductCategory
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Không thể xoá danh mục";
+}
+
+<h2 class="text-danger">Không thể xoá danh mục</h2>
+
+<p class="text-danger">@ViewBag.ErrorMessage</p>
+
+<a asp-action="Index" class="btn btn-primary">Quay lại danh sách</a>
+
+@{
+}

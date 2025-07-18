@@ -1,0 +1,50 @@
+﻿@model project_dnc_se1.Models.ContactInfo
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Xoá thông tin liên hệ</h1>
+
+<h3>Bạn có chắc muốn xoá liên hệ này chứ?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Tiêu đề
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class="col-sm-2">
+            Tin nhắn
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Message)
+        </dd>
+        <dt class="col-sm-2">
+            Sự kiện
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Events.Title)
+        </dd>
+        <dt class="col-sm-2">
+            Sản phẩm
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Product.Title)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xoá" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </form>
+</div>

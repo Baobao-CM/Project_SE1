@@ -1,0 +1,40 @@
+﻿@model IEnumerable<project_dnc_se1.Models.ProductCategory>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Quản lý sản phẩm";
+
+}
+
+<h1>Danh mục sản phẩm</h1>
+
+<p>
+    <a asp-action="Create" class=" btn btn-primary">Tạo mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Tiêu đề
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

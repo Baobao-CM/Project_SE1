@@ -1,0 +1,139 @@
+﻿@model project_dnc_se1.Models.Product
+
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+}
+
+<h1>Sửa sản phẩm</h1>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="ImageUrls" />
+            <input type="hidden" asp-for="ThumbNail" />
+            <input type="hidden" id="removedImages" name="removedImages" />
+
+            <!-- Tên sản phẩm -->
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Tên sản phẩm</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <!-- Mô tả -->
+            <div class="form-group mt-3">
+                <label asp-for="Description" class="control-label">Mô tả</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <!-- Thumbnail -->
+            <div class="form-group mt-3">
+                <label>Ảnh đại diện hiện tại</label>
+                @if (!string.IsNullOrEmpty(Model.ThumbNail))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.ThumbNail" class="img-thumbnail" style="width: 200px; height: 200px; object-fit: cover;" />
+                    </div>
+                }
+                <label>Tải ảnh đại diện mới</label>
+                <input type="file" name="thumbnailFile" class="form-control" />
+            </div>
+
+            <!-- Ảnh sản phẩm chi tiết -->
+            <div class="form-group mt-3">
+                <label>Ảnh sản phẩm hiện tại</label>
+                @if (!string.IsNullOrEmpty(Model.ImageUrls))
+                {
+                    <div class="d-flex flex-wrap">
+                        @foreach (var img in Model.ImageUrls.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <div class="p-2 position-relative">
+                                <img src="@img" class="img-thumbnail" style="width: 200px; height: 200px; object-fit: cover;" />
+                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                        onclick="removeImage(this, '@img')">×</button>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>Chưa có ảnh sản phẩm nào.</p>
+                }
+
+                <label class="mt-3">Tải ảnh mới</label>
+                <input type="file" name="productImages" multiple class="form-control" />
+            </div>
+
+            <!-- Danh mục -->
+            <div class="form-group mt-3">
+                <label asp-for="CategoryId" class="control-label">Danh mục</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
+                    <option value="">-- Chọn danh mục --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <!-- Nổi bật -->
+            <div class="form-group form-check mt-3">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsFeatured" />
+                    Nổi bật
+                </label>
+            </div>
+
+            <!-- Nút submit -->
+            <div class="form-group mt-3 d-flex gap-2">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+            </div>
+        </form>
+        @if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-3">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@error.ErrorMessage</div>
+        }
+    </div>
+}
+
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <!-- Xử lý xóa ảnh -->
+    <script>
+        function removeImage(button, imageUrl) {
+            var removedInput = document.getElementById('removedImages');
+            removedInput.value += removedInput.value ? ";" + imageUrl : imageUrl;
+            button.parentElement.remove();
+        }
+    </script>
+
+    <!-- CKEditor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.0/classic/ckeditor.js"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#Description'), {
+                ckfinder: {
+                    uploadUrl: '/Products/UploadImage'
+                },
+                toolbar: [
+                    'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+                    'imageUpload', 'undo', 'redo'
+                ],
+                image: {
+                    toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+}

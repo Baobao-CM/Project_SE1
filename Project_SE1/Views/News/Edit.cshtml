@@ -1,0 +1,85 @@
+﻿@model project_dnc_se1.Models.News
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sửa tin tức";
+}
+
+<h1>Chỉnh sửa tin tức</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" name="OldBanners" value="@Model.Banners" />
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Tên tin tức</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="Value" class="control-label">Mô tả</label>
+                <textarea asp-for="Value" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="CategoryId" class="control-label">Danh mục</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label class="control-label">Ảnh bìa hiện tại</label>
+                @if (!string.IsNullOrEmpty(Model.Banners))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.Banners" style="width: 200px; height: 200px; object-fit: cover;" />
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted">Chưa có ảnh bìa.</div>
+                }
+
+                <label class="control-label">Tải lên ảnh bìa mới</label>
+                <input type="file" name="BannersFile" class="form-control" />
+            </div>
+
+            <div class="form-group mt-3 d-flex gap-2">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.2.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#Value'), {
+            ckfinder: {
+                uploadUrl: '/News/UploadImage'
+            },
+            toolbar: [
+                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+                'imageUpload', 'undo', 'redo'
+            ],
+            image: {
+                toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>

@@ -1,0 +1,27 @@
+﻿ using System;
+using System.Collections.Generic;
+
+namespace project_dnc_se1.Models;
+
+public partial class News
+{
+    public int Id { get; set; }
+
+    public string? Title { get; set; }
+
+    public string? Value { get; set; }
+
+    public int? CategoryId { get; set; }
+
+    public string? Banners { get; set; }
+
+    public int? UserId { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
+    public virtual NewsCategory? Category { get; set; }
+
+    public virtual User? User { get; set; }
+}

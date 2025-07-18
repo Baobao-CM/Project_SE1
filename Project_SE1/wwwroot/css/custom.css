@@ -1,0 +1,39 @@
+﻿.text-ellipsis {
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slider-for img,
+.slider-nav img {
+    width: 100%;
+    height: auto;
+}
+
+.slider-nav {
+    margin-top: 10px;
+}
+
+    .slider-nav .img-contain {
+        width: 150px;
+        height: 150px
+    }
+
+    .slider-nav .slick-slide {
+        margin: 0 5px;
+    }
+
+    .slider-nav .slick-current img {
+        border: 2px solid #007bff;
+    }
+
+.slick-prev.slick-arrow,
+.slick-next.slick-arrow {
+    display: none !important;
+}
+
+.article-content .image img {
+    width: 100%;
+    height: 100%;
+}

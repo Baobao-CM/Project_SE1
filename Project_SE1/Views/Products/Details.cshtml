@@ -1,0 +1,89 @@
+﻿@model project_dnc_se1.Models.Product
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Chi tiết sản phẩm";
+
+}
+
+<div class="row align-items-center">
+    <div class="col-12 col-md-6">
+        <h1 class="d-flex">
+            <span class="me-3">@Html.DisplayFor(model => model.Title)</span>
+            @* Check isFeature *@
+            <i class="bi bi-star-fill text-warning"></i>
+
+        </h1>
+
+    </div>
+    <div class="col-12 col-md-6 text-end">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="text-decoration-none">
+            <i class="bi bi-pencil-square" style="font-size:30px"></i>
+        </a>
+    </div>
+
+</div>
+
+<div>
+    <h4>
+        @Html.DisplayFor(model => model.Category.Title)
+    </h4>
+    <hr />
+    <div class="mt-4 row">
+        <div class="col-12 col-md-6 col-lg-4">
+
+
+            <div class="slider-for">
+                @foreach (var img in Model.ImageUrls?.Split(';') ?? new string[0])
+                {
+                    <div><img src="@img" class="img-fluid" /></div>
+                }
+            </div>
+
+            <div class="slider-nav mt-2">
+                @foreach (var img in Model.ImageUrls?.Split(';') ?? new string[0])
+                {
+                    <div class="img-contain">
+                        <img src="@img" style="height: 80px; object-fit: cover;" />
+                    </div>
+                }
+            </div>
+
+        </div>
+        <div class="col-12 col-md-6 col-lg-8">
+            <div class="article-content">
+                @Html.Raw(Model.Description)
+            </div>
+        </div>
+    </div>
+
+</div>
+<div>
+
+    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.slider-for').slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                arrows: false,
+                fade: true,
+                dots: false,
+                prevArrow: false,
+                nextArrow: false,
+                asNavFor: '.slider-nav'
+            });
+
+            $('.slider-nav').slick({
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                asNavFor: '.slider-for',
+                dots: false,
+                centerMode: true,
+                focusOnSelect: true
+            });
+        });
+    </script>
+}
