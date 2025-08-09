@@ -121,14 +121,15 @@ namespace project_dnc_se1.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Value,CategoryId,IsDeleted,Banners")] Event @event, IFormFile? BannersFile,
+        public async Task<IActionResult> Edit(int id, Event @event, IFormFile? BannersFile,
     string? OldBanners)
         {
             if (id != @event.Id)
             {
                 return NotFound();
             }
-
+            var existing = await _context.Events.FindAsync(id);
+            if (existing == null) return NotFound();
             //  Gán người dùng từ session (nếu chưa đăng nhập thì chuyển hướng)
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -148,46 +149,52 @@ namespace project_dnc_se1.Controllers
             // Loại bỏ lỗi validate không cần thiết (nếu có)
             ModelState.Remove("OldBanners");
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
+                ViewData["CategoryId"] = new SelectList(_context.EventsCategories, "Id", "Title", @event.CategoryId);
+                return View(@event);
+
+            }
+            // Cập nhật các trường cơ bản
+            existing.Title = @event.Title;
+            existing.Value = @event.Value;
+            existing.CategoryId = @event.CategoryId;
+            existing.UpdatedAt = DateTime.Now;
+            try
+            {
+                //  Nếu có file mới → xử lý lưu ảnh
+                if (BannersFile != null && BannersFile.Length > 0)
                 {
-                    //  Nếu có file mới → xử lý lưu ảnh
-                    if (BannersFile != null && BannersFile.Length > 0)
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(BannersFile.FileName)}";
+                    var filePath = Path.Combine(_env.WebRootPath, "images/events", fileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(BannersFile.FileName)}";
-                        var filePath = Path.Combine(_env.WebRootPath, "images/events", fileName);
-
-                        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await BannersFile.CopyToAsync(stream);
-                        }
-
-                        @event.Banners = "/images/events/" + fileName;
-                    }
-                    else
-                    {
-                        // Không có ảnh mới → giữ ảnh cũ
-                        @event.Banners = OldBanners;
+                        await BannersFile.CopyToAsync(stream);
                     }
 
-                    _context.Update(@event);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    existing.Banners = "/images/events/" + fileName;
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!EventExists(@event.Id))
-                        return NotFound();
-                    else
-                        throw;
+                    // Không có ảnh mới → giữ ảnh cũ
+                    existing.Banners = OldBanners;
                 }
+
+                _context.Update(existing);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EventExists(existing.Id))
+                    return NotFound();
+                else
+                    throw;
             }
 
-            ViewData["CategoryId"] = new SelectList(_context.EventsCategories, "Id", "Title", @event.CategoryId);
-            return View(@event);
         }
 
 

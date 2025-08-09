@@ -1,0 +1,36 @@
+﻿@model IEnumerable<project_dnc_se1.Models.NewsCategory>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    ViewData["Title"] = "Xoá tạm danh mục tin tức";
+
+}
+
+<h2>Tin tức đã xoá</h2>
+<div class="form-group mt-3 d-flex gap-2">
+    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tiêu đề</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>
+                    <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-success btn-sm">Phục hồi</button>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

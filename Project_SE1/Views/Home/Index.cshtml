@@ -1,9 +1,216 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml"; // user layout 
+﻿@using System.Text.RegularExpressions
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Home Page";
+    var bannerImages = ViewData["BannerImages"] as List<string> ?? new List<string>();
+    var productList = ViewData["productList"] as List<Product>;
+    var newestNews = ViewData["newestNews"] as News;
+    var featuredNewsList = ViewData["featuredNewsList"] as List<News>;
+    var latestEvents = ViewData["LatestEvents"] as List<project_dnc_se1.Models.Event>;
 }
+}
+<!-- Banner -->
+<section id="home" class="banner-slider">
+    @if (bannerImages.Any())
+    {
+        @foreach (var img in bannerImages)
+        {
+            <div>
+                <img src="@Url.Content(img)" class="w-100 vh-100 object-fit-cover" alt="Banner" />
+            </div>
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Trang chu</p>
-</div>
+    }
+    else
+    {
+        <div>
+            <img src="https://placehold.co/1200x600" class="w-100 vh-100 object-fit-cover" alt="Default Banner" />
+        </div>
+    }
+</section>
+
+<!-- Product list -->
+<section id="product">
+    <h1 class="text-center mt-4">Mẫu váy mới 2025</h1>
+    <div class="container products">
+        <div class="row">
+            @if (productList != null && productList.Any())
+            {
+                foreach (var product in productList)
+                {
+                    <div class="col-3 mt-4 product-item">
+                        <a href="#" class="text-decoration-none text-dark">
+                            <img src="@product.ThumbNail" class="figure-img img-fluid rounded" alt="@product.Title">
+                            <div class="figure-caption text-center mt-2 fw-bold">@product.Title</div>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 mt-4 text-center">
+                    <p>Hiện chưa có sản phẩm nào.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- hot news -->
+@if (newestNews != null)
+{
+    <section class="container mt-5 news" id="news">
+        <h1 class="text-center mb-4 fw-bold">Tin tức mới nhất</h1>
+        <div class="row">
+            <!-- Hình ảnh lớn bên trái -->
+            <div class="news-img col-md-4">
+                <img src="@newestNews.Banners" class="img-fluid rounded" alt="Ảnh tin tức">
+            </div>
+
+            <!-- Nội dung bên phải -->
+            <div class="col-md-8">
+                <h4 class="fw-bold">@newestNews.Title</h4>
+                <p class="text-muted mb-1">@newestNews.Category?.Title</p>
+                <hr />
+                <p class="text-muted">Ngày đăng: @newestNews.UpdatedAt?.ToString("dd/MM/yyyy")</p>
+
+                <!-- Mô tả -->
+                <div class="mb-3">
+                    @{
+                        string plainText = Regex.Replace(newestNews.Value ?? "", "<.*?>", "");
+                        string shortText = plainText.Length > 300 ? plainText.Substring(0, 300) + "..." : plainText;
+                    }
+                    <p>@shortText</p>
+                </div>
+
+                <a href="#" class="text-decoration-none fw-semibold text-primary">Xem chi tiết</a>
+            </div>
+        </div>
+    </section>
+
+}
+<!-- tin tức nổi bật khác -->
+@if (featuredNewsList != null && featuredNewsList.Any())
+{
+    <section class="container mt-5">
+        <h1 class="text-center fw-bold mb-4">Tin tức nổi bật</h1>
+        <div class="slick-featured-news">
+            @foreach (var news in featuredNewsList)
+            {
+                <div class="px-2">
+                    <div class="card h-100">
+                        <img src="@news.Banners" class="card-img-top" alt="@news.Title" />
+                        <div class="card-body">
+                            <h5 class="card-title">@news.Title</h5>
+                            <p class="card-text text-muted">
+                                @(news.Value?.Length > 100 ? news.Value.Substring(0, 100) + "..." : news.Value)
+                            </p>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+<!--sự kiện khuyến mãi-->
+<section class="container my-5 events" id="event">
+    <h1 class="text-center fw-bold mb-4">Khuyến mãi - Sự kiện</h1>
+    <div class="row g-3">
+        <!-- Left image -->
+        <div class="col-md-8">
+            @if (latestEvents != null && latestEvents.Count > 0)
+            {
+                var ev = latestEvents[0];
+                <img src="@ev.Banners" class="img-fluid w-100 rounded shadow-sm object-fit-cover event__img-left" alt="@ev.Title">
+            }
+            else
+            {
+                <img src="/images/default.jpg" class="img-fluid w-100 rounded shadow-sm object-fit-cover event__img-left" alt="Không có sự kiện">
+            }
+        </div>
+
+        <!-- Right images (vertical) -->
+        <div class="col-md-4 d-flex flex-column justify-content-between">
+            @for (int i = 1; i < latestEvents?.Count; i++)
+            {
+                var ev = latestEvents[i];
+                <div class="mb-3">
+                    <img src="@ev.Banners" class="img-fluid w-100 rounded shadow-sm object-fit-cover event__img-right" alt="@ev.Title">
+                </div>
+            }
+
+            @* Nếu không đủ 3 sự kiện, thêm ảnh mặc định *@
+            @for (int i = latestEvents?.Count ?? 0; i < 3; i++)
+            {
+                <div class="mb-3">
+                    <img src="/images/default.jpg" class="img-fluid w-100 rounded shadow-sm object-fit-cover event__img-right" alt="Sự kiện khác">
+                </div>
+            }
+        </div>
+    </div>
+</section>
+<!--contactform-->
+<section class="container my-5 contact" id="contact">
+    <h1 class="text-center fw-bold mb-4">Liên hệ</h1>
+    <div class="row">
+        <div class="col-6">
+            <img src="/images/aodai_chuhy.jpg" class="img-fluid border rounded picture-right" alt="">
+        </div>
+        <div class="col-6">
+            <form action="/" method="post">
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                    <label for="floatingTextarea">Tiêu đề</label>
+                </div>
+                <div class="form-floating mt-4">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                    <label for="floatingTextarea">Email</label>
+                </div>
+                <select class="form-select mt-4" aria-label="Default select example">
+                    <option selected>Chọn sự kiện mà bạn quan tâm</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                </select>
+                <select class="form-select mt-4" aria-label="Default select example">
+                    <option selected>Chọn sản phẩm mà bạn quan tâm</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                </select>
+                <div class="form-floating mt-4">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                    <label for="floatingTextarea2">Nội dung</label>
+                </div>
+                <button type="button" class="btn btn-outline-dark mt-4">Gửi liên hệ</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.slick-featured-news').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                arrows: true,
+                dots: false,
+                autoplay: true,
+                autoplaySpeed: 3000,
+                responsive: [
+                    {
+                        breakpoint: 992,
+                        settings: { slidesToShow: 2 }
+                    },
+                    {
+                        breakpoint: 576,
+                        settings: { slidesToShow: 1 }
+                    }
+                ]
+            });
+        });
+    </script>
+}

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using project_dnc_se1.Models;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace project_dnc_se1.Controllers
 {
@@ -19,9 +20,25 @@ namespace project_dnc_se1.Controllers
         }
 
         // GET: NewsCategories
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string keyword, int? page)
         {
-            return View(await _context.NewsCategories.ToListAsync());
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+
+            var categories = _context.NewsCategories
+                .Where(c => c.IsDeleted != true)  // fix nullable bool here
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                categories = categories.Where(c => c.Title.Contains(keyword));
+            }
+
+            var pagedList = categories
+                .OrderBy(c => c.Id)
+                .ToPagedList(pageNumber, pageSize);
+
+            return View(pagedList);
         }
 
         // GET: NewsCategories/Details/5
@@ -49,8 +66,6 @@ namespace project_dnc_se1.Controllers
         }
 
         // POST: NewsCategories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title")] NewsCategory newsCategory)
@@ -81,8 +96,6 @@ namespace project_dnc_se1.Controllers
         }
 
         // POST: NewsCategories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] NewsCategory newsCategory)
@@ -115,25 +128,51 @@ namespace project_dnc_se1.Controllers
             return View(newsCategory);
         }
 
-        // GET: NewsCategories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // Soft delete
+        [HttpPost]
+        public async Task<IActionResult> SoftDelete(int id)
         {
-            if (id == null)
+            var nc = await _context.NewsCategories.FindAsync(id);
+            if (nc == null)
             {
                 return NotFound();
             }
 
-            var newsCategory = await _context.NewsCategories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (newsCategory == null)
-            {
-                return NotFound();
-            }
+            nc.IsDeleted = true;
+            _context.Update(nc);
+            await _context.SaveChangesAsync();
 
-            return View(newsCategory);
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: NewsCategories/Delete/5
+        // Restore từ trash
+        [HttpPost, ActionName("Restore")]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var nc = await _context.NewsCategories.FindAsync(id);
+            if (nc == null)
+            {
+                return NotFound();
+            }
+
+            nc.IsDeleted = false;
+            _context.Update(nc);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Trash));
+        }
+
+        // Trang danh sách đã xoá
+        public async Task<IActionResult> Trash()
+        {
+            var deletedNews = await _context.NewsCategories
+                .Where(n => n.IsDeleted == true)
+                .ToListAsync();
+
+            return View(deletedNews);
+        }
+
+        // POST: NewsCategories/Delete/5 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -142,10 +181,10 @@ namespace project_dnc_se1.Controllers
             if (newsCategory != null)
             {
                 _context.NewsCategories.Remove(newsCategory);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Trash));
         }
 
         private bool NewsCategoryExists(int id)

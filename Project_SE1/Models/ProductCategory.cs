@@ -9,5 +9,7 @@ public partial class ProductCategory
 
     public string? Title { get; set; }
 
+    public bool? IsDeleted { get; set; } = false;
+
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

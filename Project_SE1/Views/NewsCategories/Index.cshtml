@@ -1,16 +1,28 @@
-﻿@model IEnumerable<project_dnc_se1.Models.NewsCategory>
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<project_dnc_se1.Models.NewsCategory>
 
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Danh mục tin tức";
 
 }
 
 <h1>Danh mục tin tức</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div style="display: flex; gap: 10px;">
+        <a asp-action="Create" class="btn btn-primary">Tạo danh mục</a>
+        <a asp-action="Trash" class="btn btn-success">Danh sách đã xoá</a>
+    </div>
+    <div>
+        <form method="get" asp-controller="NewsCategories" asp-action="Index" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm theo tên danh mục..." class="form-control" />
+            <button type="submit" class="btn btn-outline-info"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -31,11 +43,33 @@
                     <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
                         <i class="bi bi-pencil-square"></i>
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <form asp-action="SoftDelete" asp-route-id="@item.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xoá?')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Thanh phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            keyword = Context.Request.Query["keyword"]
+        }),
+            new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>

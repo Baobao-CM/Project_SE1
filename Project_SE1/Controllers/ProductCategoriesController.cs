@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using project_dnc_se1.Models;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace project_dnc_se1.Controllers
 {
@@ -19,26 +20,37 @@ namespace project_dnc_se1.Controllers
         }
 
         // GET: ProductCategories
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string keyword, int? page)
         {
-            return View(await _context.ProductCategories.ToListAsync());
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
 
+            var categories = _context.ProductCategories
+                .Where(c => c.IsDeleted != true)  // fix nullable bool here
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                categories = categories.Where(c => c.Title.Contains(keyword));
+            }
+
+            var pagedList = categories
+                .OrderBy(c => c.Id)
+                .ToPagedList(pageNumber, pageSize);
+
+            return View(pagedList);
         }
+
+
 
         // GET: ProductCategories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var productCategory = await _context.ProductCategories
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (productCategory == null)
-            {
-                return NotFound();
-            }
+            if (productCategory == null) return NotFound();
 
             return View(productCategory);
         }
@@ -50,8 +62,6 @@ namespace project_dnc_se1.Controllers
         }
 
         // POST: ProductCategories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title")] ProductCategory productCategory)
@@ -68,30 +78,20 @@ namespace project_dnc_se1.Controllers
         // GET: ProductCategories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var productCategory = await _context.ProductCategories.FindAsync(id);
-            if (productCategory == null)
-            {
-                return NotFound();
-            }
+            if (productCategory == null) return NotFound();
+
             return View(productCategory);
         }
 
         // POST: ProductCategories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] ProductCategory productCategory)
         {
-            if (id != productCategory.Id)
-            {
-                return NotFound();
-            }
+            if (id != productCategory.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -103,13 +103,9 @@ namespace project_dnc_se1.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ProductCategoryExists(productCategory.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -119,42 +115,76 @@ namespace project_dnc_se1.Controllers
         // GET: ProductCategories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var productCategory = await _context.ProductCategories
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (productCategory == null)
-            {
-                return NotFound();
-            }
-            // Kiểm tra có sản phẩm nào đang dùng category này không    
-            bool isUsed = await _context.Products.AnyAsync(p => p.CategoryId == id);
+            if (productCategory == null) return NotFound();
 
+            // Kiểm tra nếu đang được dùng bởi sản phẩm
+            bool isUsed = await _context.Products.AnyAsync(p => p.CategoryId == id);
             if (isUsed)
             {
-                ViewBag.ErrorMessage = "Danh mục " + productCategory.Title + " này đang được sử dụng, bạn không thể xoá.";
+                ViewBag.ErrorMessage = "Danh mục \"" + productCategory.Title + "\" đang được sử dụng, bạn không thể xoá.";
                 return View("DeleteBlocked", productCategory);
             }
 
             return View(productCategory);
         }
 
-        // POST: ProductCategories/Delete/5
+        // POST: Soft delete thay vì xoá vĩnh viễn
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> SoftDeleteConfirmed(int id)
         {
-            var productCategory = await _context.ProductCategories.FindAsync(id);
-            if (productCategory != null)
+            var category = await _context.ProductCategories.FindAsync(id);
+            if (category != null)
             {
-                _context.ProductCategories.Remove(productCategory);
+                category.IsDeleted = true;
+                _context.Update(category);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Trash - Danh sách đã xoá tạm
+        public async Task<IActionResult> Trash()
+        {
+            var deletedCategories = await _context.ProductCategories
+                .Where(c => c.IsDeleted == true)
+                .ToListAsync();
+
+            return View(deletedCategories);
+        }
+
+        // POST: Khôi phục
+        [HttpPost]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var category = await _context.ProductCategories.FindAsync(id);
+            if (category == null) return NotFound();
+
+            category.IsDeleted = false;
+            _context.Update(category);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Trash));
+        }
+
+        // POST: Xoá vĩnh viễn (nếu muốn)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteForever(int id)
+        {
+            var category = await _context.ProductCategories.FindAsync(id);
+            if (category != null)
+            {
+                _context.ProductCategories.Remove(category);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Trash));
         }
 
         private bool ProductCategoryExists(int id)

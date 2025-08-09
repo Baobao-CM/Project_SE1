@@ -1,36 +1,66 @@
 ﻿@model project_dnc_se1.Models.CompanyInfo
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa";
+    var isImage = ViewData["IsImage"] as bool? ?? false;
 }
 
-<h1>Sửa thông tin</h1>
+<h1>Chỉnh sửa thông tin</h1>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+    <div class="col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.Id" />
+
             <div class="form-group">
-                <label asp-for="Title" class="control-label">Tiêu đề</label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label>Tiêu đề</label>
+                <input name="Title" class="form-control" value="@Model.Title" />
             </div>
-            <div class="form-group mt-3">
-                <label asp-for="Value" class="control-label">Mô tả</label>
-                <input asp-for="Value" class="form-control" />
-                <span asp-validation-for="Value" class="text-danger"></span>
+
+            <div class="form-group">
+                <label>Loại nội dung</label><br />
+                <input type="radio" name="ValueType" value="text" @(isImage ? "" : "checked") onchange="toggleFields()" /> Văn bản
+                <input type="radio" name="ValueType" value="image" @(isImage ? "checked" : "") onchange="toggleFields()" /> Hình ảnh
             </div>
-            <div class="form-group mt-3 d-flex gap-2">
-                <input type="submit" value="Lưu" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+
+            <div class="form-group" id="textValue">
+                <label>Nội dung văn bản</label>
+                <textarea name="ValueText" class="form-control">@(!isImage ? Model.Value : "")</textarea>
             </div>
+
+            <div class="form-group" id="imageValue">
+                <label>Chọn ảnh mới (nếu muốn thay đổi)</label>
+                <input name="ValueImage" type="file" class="form-control" accept="image/*" multiple />
+                @if (isImage && !string.IsNullOrEmpty(Model.Value))
+                {
+                    <div class="mt-2">
+                        <label>Ảnh hiện tại:</label>
+                        <br />
+                        @{
+                            var imagePaths = Model.Value.Split(';');
+                            foreach (var path in imagePaths)
+                            {
+                                <img src="@path" alt="Current Image" width="100" class="mr-2 mb-2" />
+                            }
+                        }
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        function toggleFields() {
+            var type = document.querySelector('input[name="ValueType"]:checked').value;
+            document.getElementById('textValue').style.display = (type === "text") ? "block" : "none";
+            document.getElementById('imageValue').style.display = (type === "image") ? "block" : "none";
+        }
+        toggleFields(); // chạy khi load trang
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

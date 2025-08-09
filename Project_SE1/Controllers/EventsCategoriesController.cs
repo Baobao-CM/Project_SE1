@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using project_dnc_se1.Models;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace project_dnc_se1.Controllers
 {
@@ -19,14 +21,25 @@ namespace project_dnc_se1.Controllers
         }
 
         // GET: EventsCategories
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string keyword, int? page)
         {
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
 
-            var events = await _context.EventsCategories
-                .Where(e => e.IsDeleted == false)
-                .ToListAsync();
+            var categories = _context.EventsCategories
+                .Where(c => c.IsDeleted != true)  // fix nullable bool here
+                .AsQueryable();
 
-            return View(events);
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                categories = categories.Where(c => c.Title.Contains(keyword));
+            }
+
+            var pagedList = categories
+                .OrderBy(c => c.Id)
+                .ToPagedList(pageNumber, pageSize);
+
+            return View(pagedList);
         }
 
         // GET: EventsCategories/Details/5
@@ -193,6 +206,7 @@ namespace project_dnc_se1.Controllers
 
             return RedirectToAction(nameof(Trash));
         }
+
         public async Task<IActionResult> Trash()
         {
             var deletedEvents = await _context.EventsCategories

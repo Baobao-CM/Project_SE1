@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using project_dnc_se1.Models;
+using X.PagedList;
+using X.PagedList.Extensions;
+
 
 namespace project_dnc_se1.Controllers
 {
@@ -19,11 +25,39 @@ namespace project_dnc_se1.Controllers
         }
 
         // GET: ContactInfoes
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string keyword, int? productId, int? eventId, int? page)
         {
-            var companyWebContext = _context.ContactInfos.Include(c => c.Events).Include(c => c.Product);
-            return View(await companyWebContext.ToListAsync());
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+
+            // Gán dropdown list cho view
+            ViewBag.Products = _context.Products.ToList();
+            ViewBag.Events = _context.Events.ToList();
+            ViewBag.SelectedProductId = productId;
+            ViewBag.SelectedEventId = eventId;
+            ViewBag.Keyword = keyword;
+
+            var query = _context.ContactInfos
+                                .Include(c => c.Product)
+                                .Include(c => c.Events)
+                                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+                query = query.Where(c => c.Email.Contains(keyword));
+
+            if (productId.HasValue && productId > 0)
+                query = query.Where(c => c.ProductId == productId.Value);
+
+            if (eventId.HasValue && eventId > 0)
+                query = query.Where(c => c.EventsId == eventId.Value);
+
+            var pagedList = query.OrderByDescending(c => c.Id)
+                                 .ToPagedList(pageNumber, pageSize);
+
+            return View(pagedList);
         }
+
+
 
         // GET: ContactInfoes/Details/5
         public async Task<IActionResult> Details(int? id)

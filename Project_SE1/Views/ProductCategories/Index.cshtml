@@ -1,21 +1,26 @@
-﻿@model IEnumerable<project_dnc_se1.Models.ProductCategory>
-@{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // đường dẫn tới layout admin
-    ViewData["Title"] = "Quản lý sản phẩm";
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<project_dnc_se1.Models.ProductCategory>
 
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý sản phẩm";
 }
 
 <h1>Danh mục sản phẩm</h1>
 
-<p>
-    <a asp-action="Create" class=" btn btn-primary">Tạo mới</a>
-</p>
-<table class="table">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+    <form method="get" asp-controller="ProductCategories" asp-action="Index" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="keyword" value="@Context.Request.Query["keyword"]" placeholder="Tìm theo tên danh mục..." class="form-control" />
+        <button type="submit" class="btn btn-outline-info"><i class="bi bi-search"></i></button>
+    </form>
+</div>
+
+<table class="table mt-3">
     <thead>
         <tr>
-            <th>
-                Tiêu đề
-            </th>
+            <th>Tiêu đề</th>
             <th></th>
         </tr>
     </thead>
@@ -23,9 +28,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
+                <td>@item.Title</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
                         <i class="bi bi-pencil-square"></i>
@@ -38,3 +41,23 @@
         }
     </tbody>
 </table>
+
+<!-- Thanh phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            keyword = Context.Request.Query["keyword"]
+        }),
+            new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>

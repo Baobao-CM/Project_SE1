@@ -7,29 +7,43 @@
 <h1>Tạo mới thông tin</h1>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div class="form-group">
-                <label asp-for="Title" class="control-label">Tiêu đề</label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label>Tiêu đề</label>
+                <input name="Title" class="form-control" />
             </div>
-            <div class="form-group mt-3">
-                <label asp-for="Value" class="control-label">Mô tả</label>
-                <input asp-for="Value" class="form-control" />
-                <span asp-validation-for="Value" class="text-danger"></span>
+
+            <div class="form-group">
+                <label>Loại nội dung</label><br />
+                <input type="radio" name="valueType" value="text" checked onchange="toggleFields()" /> Văn bản
+                <input type="radio" name="valueType" value="image" onchange="toggleFields()" /> Hình ảnh
             </div>
-            <div class="form-group mt-3 d-flex gap-2">
-                <input type="submit" value="Lưu" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+
+            <div class="form-group" id="textValue">
+                <label>Nội dung văn bản</label>
+                <textarea name="ValueText" class="form-control"></textarea>
             </div>
+
+            <div class="form-group" id="imageValue" style="display:none">
+                <label>Chọn ảnh</label>
+                <input name="ValueImage" type="file" class="form-control" accept="image/*" multiple />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        function toggleFields() {
+            var type = document.querySelector('input[name="valueType"]:checked').value;
+            document.getElementById('textValue').style.display = (type === "text") ? "block" : "none";
+            document.getElementById('imageValue').style.display = (type === "image") ? "block" : "none";
+        }
+        toggleFields(); // Gọi khi load trang
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

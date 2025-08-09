@@ -11,3 +11,14 @@ public partial class CompanyInfo
 
     public string? Value { get; set; }
 }
+public class CompanyInfoViewModel
+{
+    public string Title { get; set; }
+
+    public string ValueText { get; set; }
+
+    public IFormFile[] ValueImage { get; set; }
+
+    public string ValueType { get; set; } // "text" hoặc "image"
+}
+

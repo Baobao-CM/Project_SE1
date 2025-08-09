@@ -1,106 +1,150 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" class="h-100">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - project_dnc_se1</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/lib/bootstrap/bootstrap-icons/bootstrap-icons.css" />
+    <title>@ViewData["Title"] - Lynn bridal</title>
+
+    <!-- Bootstrap & Slick -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+
+    <!-- Font Awesome / Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/project_dnc_se1.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" type="text/css" href="~/css/slick.css" />
-    <link rel="stylesheet" type="text/css" href="~/css/slick-theme.css" />
-    <link href="/css/custom.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/custom.css" />
+    <link rel="stylesheet" href="/css/UI.css" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">project_dnc_se1</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- 🔝 Sub-header -->
+    <div class="sub-header text-white bg-dark py-1">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap small">
+            <div>
+                <!-- Hotline -->
+                @if (ViewData["Hotline"] != null)
+                {
+                    <small class="mb-1 d-block"><a href="tel: @ViewData["Hotline"]" class="text-white"><i class="bi bi-telephone-fill"></i> @ViewData["Hotline"]</a></small>
+                }
+                @if (ViewData["Address"] != null)
+                {
+                    <small><i class="bi bi-house-door-fill"></i> @ViewData["Address"]</small>
+                }
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="@ViewData["Facebook"]" target="_blank" class="btn rounded-circle d-flex align-items-center justify-content-center btn-social">
+                    <i class="bi bi-facebook"></i>
+                </a>
+                <a href="@ViewData["TikTok"]" target="_blank" class="btn rounded-circle d-flex align-items-center justify-content-center btn-social">
+                    <i class="bi bi-tiktok"></i>
+                </a>
+                <a href="@ViewData["Instagram"]" target="_blank" class="btn rounded-circle d-flex align-items-center justify-content-center btn-social">
+                    <i class="bi bi-instagram"></i>
+                </a>
+                <a href="@ViewData["YouTube"]" target="_blank" class="btn rounded-circle d-flex align-items-center justify-content-center btn-social">
+                    <i class="bi bi-youtube"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌸 Header + Navbar -->
+    <header class="main-header" style="background-color: var(--primary-color); color: white;">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <a class="navbar-brand fw-bold" href="#">Lynn Bridal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a href="#home" class="nav-link">Trang chủ</a></li>
+                        <li class="nav-item"><a href="#product" class="nav-link">Sản phẩm</a></li>
+                        <li class="nav-item"><a href="#news" class="nav-link">Tin tức</a></li>
+                        <li class="nav-item"><a href="#event" class="nav-link">Sự kiện</a></li>
+                        <li class="nav-item"><a href="#contact" class="nav-link">Liên hệ</a></li>
                     </ul>
 
+                    <!-- Phần user -->
                     <ul class="navbar-nav">
-
                         @if (HttpContextAccessor.HttpContext.Session.GetString("FullName") != null)
                         {
-
-                                                    <li class="nav-item dropdown">
-                                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fas fa-user fa-fw"></i> @HttpContextAccessor.HttpContext.Session.GetString("FullName")
-                                                        </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li class="nav-item">
-                                                                <a class="dropdown-item" asp-controller="Users" asp-action="RedirectToManager">Quản lí</a>
-
-                                                            </li>   
-                                                            <li><a class="dropdown-item text-danger" asp-controller="Users" asp-action="Logout">Đăng xuất</a></li>
-
-                                                        </ul>
-
-                                                    </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user fa-fw"></i> @HttpContextAccessor.HttpContext.Session.GetString("FullName")
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Users" asp-action="RedirectToManager">Quản lí</a></li>
+                                    <li><a class="dropdown-item text-danger" asp-controller="Users" asp-action="Logout">Đăng xuất</a></li>
+                                </ul>
+                            </li>
                         }
                         else
                         {
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" asp-controller="Users" asp-action="Login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
-                                                    </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Users" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                                </a>
+                            </li>
                         }
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
 
-            @RenderBody()
 
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- ⭐ Nội dung chính -->
+    @RenderBody()
+
+
+    <!-- 👣 Footer -->
+    <footer class="text-white py-5 mt-auto">
         <div class="container">
-            &copy; 2025 - project_dnc_se1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <div class="col-3">
+                    <h5 class="fw-bold">VỀ CHÚNG TÔI</h5>
+                    <p class="">Dể tiện phục vụ quý khách được tốt nhất xin quý khách vui lòng nhắn tin trước cho shop nhé </p>
+                </div>
+                <div class="col-3">
+                    <h5 class="fw-bold">LIÊN HỆ</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            @if (ViewData["Address"] != null)
+                            {
+                                <small><i class="bi bi-house-door-fill"></i> @ViewData["Address"]</small>
+                            }
+                        </li>
+                        <li><small><i class="bi bi-telephone-fill"></i> @ViewData["Hotline"]</small></li>
+                        <li><small><i class="bi bi-envelope-open"></i> @ViewData["Email"]</small></li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script type="text/javascript" src="/js/slick.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            $('.slider-for').slick({
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                arrows: true,
-                fade: true,
-                asNavFor: '.slider-nav'
-            });
+    <div class="bg-dark text-white py-2 mt-auto">
+        <div class="container text-center">
+            &copy; 2025 - Lynn Bridal. Đã đăng ký bản quyền.
+        </div>
+    </div>
 
-            $('.slider-nav').slick({
-                slidesToShow: 3,
-                slidesToScroll: 1,
-                asNavFor: '.slider-for',
-                dots: false,
-                centerMode: true,
-                focusOnSelect: true
-            });
-        });
-        </Script>
+    <!-- JS thư viện -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+    <script src="/js/slider.js"></script>
 
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

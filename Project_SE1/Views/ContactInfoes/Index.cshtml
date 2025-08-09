@@ -1,67 +1,90 @@
-﻿@model IEnumerable<project_dnc_se1.Models.ContactInfo>
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<project_dnc_se1.Models.ContactInfo>
 
 @{
-    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Liên hệ khách hàng";
 }
 
-<h1>Liên hệ khách hàng</h1>
+<h1 class="mt-4">Liên hệ khách hàng</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Tạo mới liên hệ</a>
-</p>
-<table class="table">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <a class="btn btn-primary" asp-action="Create">Tạo mới liên hệ</a>
+
+    <form method="get" asp-action="Index" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="email" value="@Context.Request.Query["email"]" placeholder="Tìm theo email..." class="form-control" />
+
+        <select name="productId" class="form-select">
+            <option value="">Tất cả sản phẩm</option>
+            @foreach (var product in ViewBag.Products as List<project_dnc_se1.Models.Product>)
+            {
+                var selected = product.Id.ToString() == (ViewBag.SelectedProductId?.ToString() ?? "") ? "selected" : "";
+                <option value="@product.Id" selected="@selected">@product.Title</option>
+            }
+        </select>
+
+        <select name="eventId" class="form-select">
+            <option value="">Tất cả sự kiện</option>
+            @foreach (var ev in ViewBag.Events as List<project_dnc_se1.Models.Event>)
+            {
+                var selected = ev.Id.ToString() == (ViewBag.SelectedEventId?.ToString() ?? "") ? "selected" : "";
+                <option value="@ev.Id" selected="@selected">@ev.Title</option>
+            }
+        </select>
+
+        <button type="submit" class="btn btn-outline-info"><i class="bi bi-search"></i></button>
+    </form>
+</div>
+
+<table class="table mt-3">
     <thead>
         <tr>
-            <th>
-                Tiêu đề
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                Tin nhắn
-            </th>
-            <th>
-                Sự kiện
-            </th>
-            <th>
-                Sản phẩm
-            </th>
-            <th></th>
+            <th>Tiêu đề</th>
+            <th>Email</th>
+            <th>Tin nhắn</th>
+            <th>Sự kiện</th>
+            <th>Sản phẩm</th>
+            <th>Hành động</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
+                <td>@item.Title</td>
+                <td>@item.Email</td>
+                <td>@item.Message</td>
+                <td>@(item?.Events?.Title ?? "--")</td>
+                <td>@(item?.Product?.Title ?? "--")</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Message)
-                </td>
-                <td>
-                    @Html.Raw(item?.Events?.Title ?? "--")
-                </td>
-                <td>
-                    @Html.Raw(item?.Product?.Title ?? "--")
-                </td>
-
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
-                        <i class="bi bi-journal-richtext"></i>
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none"><i class="bi bi-pencil-square"></i></a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none"><i class="bi bi-journal-richtext"></i></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none"><i class="bi bi-trash"></i></a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            email = Context.Request.Query["email"],
+            productId = Context.Request.Query["productId"],
+            eventId = Context.Request.Query["eventId"]
+        }),
+            new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>
